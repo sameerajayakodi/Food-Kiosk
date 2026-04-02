@@ -39,9 +39,9 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 flex">
+    <div className="h-screen w-full overflow-hidden bg-gradient-to-b from-slate-50 to-slate-100 flex">
       <aside
-        className={`${sidebarOpen ? "w-72" : "w-24"} border-r border-slate-200 bg-white/90 backdrop-blur-sm transition-all duration-300 flex flex-col`}
+        className={`shrink-0 ${sidebarOpen ? "w-72" : "w-24"} border-r border-slate-200 bg-white/90 backdrop-blur-sm transition-all duration-300 flex flex-col`}
       >
         <div className="p-4 border-b border-slate-200">
           <div className="flex items-center justify-between">
@@ -104,7 +104,7 @@ export default function AdminPage() {
         </div>
       </aside>
 
-      <main className="flex-1 min-w-0">
+      <main className="flex-1 min-w-0 h-full overflow-auto">
         <Outlet />
       </main>
     </div>
