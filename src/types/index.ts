@@ -26,6 +26,7 @@ export interface Employee {
   position: 'Manager' | 'Cashier' | 'Cook' | 'Delivery';
   joinDate: string;
   salary: number;
+  points: number;
   active: boolean;
 }
 

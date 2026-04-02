@@ -1,4 +1,4 @@
-import { Edit3, Plus, Save, Search, Trash2, X } from "lucide-react";
+import { Coins, Edit3, Plus, Save, Search, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import { useStore } from "../../store/useStore";
 import type { Employee } from "../../types";
@@ -25,7 +25,7 @@ const emptyForm: EmployeeForm = {
 };
 
 export default function AdminEmployees() {
-  const { employees, addEmployee, updateEmployee, deleteEmployee } = useStore();
+  const { employees, addEmployee, updateEmployee, deleteEmployee, topUpEmployeePoints } = useStore();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [filterPosition, setFilterPosition] = useState<
@@ -35,6 +35,8 @@ export default function AdminEmployees() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<EmployeeForm>(emptyForm);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [topUpId, setTopUpId] = useState<string | null>(null);
+  const [topUpAmount, setTopUpAmount] = useState("");
 
   const positions = ["Manager", "Cashier", "Cook", "Delivery"] as const;
 
@@ -81,6 +83,7 @@ export default function AdminEmployees() {
       phone: form.phone.trim(),
       position: form.position,
       salary,
+      points: 0,
       joinDate: form.joinDate,
       active: form.active,
     };
@@ -99,6 +102,17 @@ export default function AdminEmployees() {
   const handleDelete = (id: string) => {
     deleteEmployee(id);
     setDeleteConfirm(null);
+  };
+
+  const handleTopUpSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!topUpId) return;
+    const amount = parseInt(topUpAmount, 10);
+    if (!isNaN(amount) && amount > 0) {
+      topUpEmployeePoints(topUpId, amount);
+    }
+    setTopUpId(null);
+    setTopUpAmount("");
   };
 
   const getTotalPayroll = () => {
@@ -195,6 +209,9 @@ export default function AdminEmployees() {
                 Contact
               </th>
               <th className="text-left px-6 py-4 text-sm font-semibold text-slate-700">
+                Points
+              </th>
+              <th className="text-left px-6 py-4 text-sm font-semibold text-slate-700">
                 Salary
               </th>
               <th className="text-left px-6 py-4 text-sm font-semibold text-slate-700">
@@ -232,6 +249,12 @@ export default function AdminEmployees() {
                   </div>
                   <div className="text-sm text-slate-500">{employee.email}</div>
                 </td>
+                <td className="px-6 py-4">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-700 font-bold text-sm">
+                     <Coins className="w-3.5 h-3.5" />
+                     {employee.points || 0}
+                  </span>
+                </td>
                 <td className="px-6 py-4 font-semibold text-slate-900">
                   {formatCurrency(employee.salary)}
                 </td>
@@ -251,6 +274,13 @@ export default function AdminEmployees() {
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex items-center justify-end gap-2">
+                    <button
+                      onClick={() => setTopUpId(employee.id)}
+                      title="Top up points"
+                      className="p-2 hover:bg-amber-100 text-amber-600 rounded-lg transition-colors"
+                    >
+                      <Coins className="w-4 h-4" />
+                    </button>
                     <button
                       onClick={() => handleOpenEdit(employee)}
                       className="p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-600"
@@ -454,6 +484,43 @@ export default function AdminEmployees() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Top Up Modal */}
+      {topUpId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+          <div className="bg-white rounded-xl shadow-lg max-w-sm w-full p-6">
+             <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold flex items-center gap-2 text-slate-900">
+                   <Coins className="w-5 h-5 text-amber-500" />
+                   Add Points
+                </h2>
+                <button onClick={() => setTopUpId(null)} className="p-1 hover:bg-slate-100 rounded-lg">
+                   <X className="w-5 h-5 text-slate-500" />
+                </button>
+             </div>
+             <form onSubmit={handleTopUpSubmit}>
+                <div className="mb-6">
+                   <label className="text-sm font-semibold text-slate-900 block mb-2">Points Amount</label>
+                   <input
+                     type="number"
+                     min="1"
+                     required
+                     value={topUpAmount}
+                     onChange={(e) => setTopUpAmount(e.target.value)}
+                     placeholder="e.g. 500"
+                     className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500 font-semibold"
+                   />
+                </div>
+                <button
+                  type="submit"
+                  className="w-full py-2.5 rounded-lg bg-amber-500 text-white font-bold hover:bg-amber-600 transition-colors"
+                >
+                  Top Up Account
+                </button>
+             </form>
           </div>
         </div>
       )}

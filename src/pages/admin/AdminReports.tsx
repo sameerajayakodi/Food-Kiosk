@@ -86,14 +86,42 @@ export default function AdminReports() {
     }));
   };
 
-  const today_stats = getTodayStats();
-  const month_stats = getMonthStats();
-  const total_stats = getTotalStats();
-  const popular = getPopularProducts();
-  const categories = getCategorySales();
+  const today_statsRaw = getTodayStats();
+  const month_statsRaw = getMonthStats();
+  const total_statsRaw = getTotalStats();
+  const popularRaw = getPopularProducts();
+  const categoriesRaw = getCategorySales();
+
+  const isDemo = orders.length === 0;
+
+  const today_stats = isDemo ? { orders: 84, revenue: 2154.50, avgOrderValue: 25.65 } : today_statsRaw;
+  const month_stats = isDemo ? { orders: 2450, revenue: 64120.00, avgOrderValue: 26.17 } : month_statsRaw;
+  const total_stats = isDemo ? { orders: 12450, revenue: 325410.25, avgOrderValue: 26.13 } : total_statsRaw;
+
+  const popular = isDemo ? [
+    { product: { id: "p1", name: "Classic Burger", category: "Lunch", price: 12.50 }, quantity: 450 },
+    { product: { id: "p2", name: "Pancakes", category: "Breakfast", price: 8.50 }, quantity: 380 },
+    { product: { id: "p3", name: "Pasta Carbonara", category: "Dinner", price: 18.00 }, quantity: 320 },
+    { product: { id: "p4", name: "French Fries", category: "Side Dishes", price: 4.50 }, quantity: 295 },
+    { product: { id: "p5", name: "Grilled Salmon", category: "Dinner", price: 24.00 }, quantity: 180 },
+  ] as any[] : popularRaw;
+
+  const categories = isDemo ? [
+    { category: "Lunch", count: 850, revenue: 12400 },
+    { category: "Dinner", count: 1200, revenue: 25300 },
+    { category: "Breakfast", count: 650, revenue: 6500 },
+    { category: "Side Dishes", count: 420, revenue: 3100 },
+  ] : categoriesRaw;
+
+  const displayOrders = isDemo ? [
+    { id: "ORD-99X21", timestamp: new Date().toISOString(), items: [{quantity:2}, {quantity:1}], total: 42.50, status: "Completed", paymentStatus: "paid" },
+    { id: "ORD-88Y14", timestamp: new Date(Date.now() - 1000*60*15).toISOString(), items: [{quantity:5}], total: 112.00, status: "Pending", paymentStatus: "unpaid" },
+    { id: "ORD-77Z33", timestamp: new Date(Date.now() - 1000*60*45).toISOString(), items: [{quantity:1}], total: 18.75, status: "Completed", paymentStatus: "paid" },
+    { id: "ORD-66A99", timestamp: new Date(Date.now() - 1000*60*90).toISOString(), items: [{quantity:3}, {quantity:2}], total: 64.20, status: "Ready", paymentStatus: "paid" },
+  ] as any[] : orders.slice().reverse().slice(0, 10);
 
   return (
-    <div className="flex-1 overflow-y-auto p-8 space-y-8">
+    <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-8">
       <div>
         <h1 className="text-3xl font-bold text-slate-900">
           Reports & Analytics
@@ -259,10 +287,7 @@ export default function AdminReports() {
               </tr>
             </thead>
             <tbody>
-              {orders
-                .slice()
-                .reverse()
-                .slice(0, 10)
+              {displayOrders
                 .map((order) => (
                   <tr
                     key={order.id}
@@ -276,7 +301,7 @@ export default function AdminReports() {
                     </td>
                     <td className="px-4 py-3 text-sm text-slate-600">
                       {order.items.reduce(
-                        (sum, item) => sum + item.quantity,
+                        (sum: number, item: any) => sum + item.quantity,
                         0,
                       )}{" "}
                       items

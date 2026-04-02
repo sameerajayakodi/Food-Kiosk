@@ -21,6 +21,7 @@ interface AppStore {
   addEmployee: (employee: Omit<Employee, 'id'>) => void;
   updateEmployee: (id: string, updates: Partial<Employee>) => void;
   deleteEmployee: (id: string) => void;
+  topUpEmployeePoints: (id: string, amount: number) => void;
 
   // Cart (for POS)
   cart: CartItem[];
@@ -48,42 +49,46 @@ interface AppStore {
 const mockEmployees: Employee[] = [
   {
     id: 'emp-001',
-    name: 'John Smith',
-    email: 'john@restaurant.com',
+    name: 'Kasun Perera',
+    email: 'kasun@restaurant.com',
     phone: '555-0101',
     position: 'Manager',
     joinDate: '2023-01-15',
     salary: 50000,
+    points: 1200,
     active: true,
   },
   {
     id: 'emp-002',
-    name: 'Sarah Johnson',
-    email: 'sarah@restaurant.com',
+    name: 'Nisansala Fernando',
+    email: 'nisansala@restaurant.com',
     phone: '555-0102',
-    position: 'Chef',
+    position: 'Cook',
     joinDate: '2023-02-20',
     salary: 45000,
+    points: 850,
     active: true,
   },
   {
     id: 'emp-003',
-    name: 'Mike Davis',
-    email: 'mike@restaurant.com',
+    name: 'Dinesh Silva',
+    email: 'dinesh@restaurant.com',
     phone: '555-0103',
     position: 'Cashier',
     joinDate: '2023-03-10',
     salary: 28000,
+    points: 2500,
     active: true,
   },
   {
     id: 'emp-004',
-    name: 'Emily Chen',
-    email: 'emily@restaurant.com',
+    name: 'Tharuka Senanayake',
+    email: 'tharuka@restaurant.com',
     phone: '555-0104',
     position: 'Cook',
     joinDate: '2023-04-05',
     salary: 32000,
+    points: 0,
     active: true,
   },
 ];
@@ -141,6 +146,15 @@ export const useStore = create<AppStore>((set, get) => ({
       employees: state.employees.filter((e) => e.id !== id),
     }));
     get().addToast('Employee deleted.', 'info');
+  },
+
+  topUpEmployeePoints: (id, amount) => {
+    set((state) => ({
+      employees: state.employees.map((e) =>
+        e.id === id ? { ...e, points: (e.points || 0) + amount } : e
+      ),
+    }));
+    get().addToast(`Added ${amount} points successfully!`, 'success');
   },
 
   // Cart
