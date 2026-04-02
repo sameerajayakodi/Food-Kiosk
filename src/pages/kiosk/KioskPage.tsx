@@ -199,39 +199,41 @@ export default function KioskPage() {
               </div>
             ) : (
               <div className="space-y-3">
-                {cart.map((item) => (
-                  <div
-                    key={item.product.id}
-                    className="bg-white relative rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex overflow-hidden"
-                  >
-                    <span className="absolute top-0 right-0 text-xs font-bold text-white bg-emerald-600 px-2 py-1 rounded-bl-xl z-10">
-                      x{item.quantity}
+                {cart.map((item, index) => (
+                  <div key={item.product.id} className="flex items-center gap-2.5">
+                    <span className="text-sm font-bold text-slate-400 shrink-0 min-w-[16px] text-right">
+                      {index + 1}.
                     </span>
-                    
-                    <div className="w-24 relative shrink-0">
-                      <img
-                        src={item.product.image}
-                        alt={item.product.name}
-                        className="w-full h-full object-cover"
-                      />
+                    <div className="bg-white flex-1 relative rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex overflow-hidden">
+                      <span className="absolute top-0 right-0 text-xs font-bold text-white bg-emerald-600 px-2 py-1 rounded-bl-xl z-10">
+                        x{item.quantity}
+                      </span>
+                      
+                      <div className="w-24 relative shrink-0">
+                        <img
+                          src={item.product.image}
+                          alt={item.product.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="flex-1 p-3 min-w-0 flex flex-col justify-center">
+                        <h4 className="font-semibold text-sm text-slate-900 mb-0.5 truncate">
+                          {item.product.name}
+                        </h4>
+                        <p className="text-xs text-slate-500 mb-1">
+                          {formatCurrency(item.product.price)} each
+                        </p>
+                        <p className="text-sm font-bold text-emerald-600">
+                          {formatCurrency(item.product.price * item.quantity)}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => removeFromCart(item.product.id)}
+                        className="w-12 flex items-center justify-center bg-transparent hover:bg-red-50 text-red-600 transition-colors shrink-0"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
                     </div>
-                    <div className="flex-1 p-3 min-w-0 flex flex-col justify-center">
-                      <h4 className="font-semibold text-sm text-slate-900 mb-0.5 truncate">
-                        {item.product.name}
-                      </h4>
-                      <p className="text-xs text-slate-500 mb-1">
-                        {formatCurrency(item.product.price)} each
-                      </p>
-                      <p className="text-sm font-bold text-emerald-600">
-                        {formatCurrency(item.product.price * item.quantity)}
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => removeFromCart(item.product.id)}
-                      className="w-12 flex items-center justify-center bg-transparent hover:bg-red-50 text-red-600 transition-colors shrink-0"
-                    >
-                      <Trash2 className="w-5 h-5" />
-                    </button>
                   </div>
                 ))}
               </div>
