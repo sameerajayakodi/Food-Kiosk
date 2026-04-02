@@ -2,6 +2,7 @@ import {
   CreditCard,
   Search,
   ShoppingCart,
+  Sparkles,
   Trash2,
   UtensilsCrossed,
 } from "lucide-react";
@@ -65,7 +66,7 @@ export default function POSPage() {
 
   if (orderResult) {
     return (
-      <div className="min-h-[calc(100vh-4rem)] bg-slate-50 flex items-center justify-center p-4">
+      <div className="min-h-screen w-full bg-slate-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-3xl shadow-xl p-8 max-w-md w-full text-center border border-emerald-200">
           <div className="w-20 h-20 bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-full flex items-center justify-center mx-auto mb-4">
             <CreditCard className="w-10 h-10 text-white" />
@@ -116,45 +117,24 @@ export default function POSPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-slate-50">
-      <div className="grid grid-cols-1 xl:grid-cols-[3fr_1fr] min-h-[calc(100vh-4rem)]">
-        <section className="">
-          {/* <div className="bg-gradient-to-r from-emerald-700 to-emerald-600 text-white rounded-3xl p-5 md:p-7 shadow-lg relative overflow-hidden">
-            <div className="absolute -right-6 -top-6 w-28 h-28 rounded-full bg-white/10" />
-            <div className="absolute right-16 top-14 text-4xl opacity-20">
-              🍜
-            </div>
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 relative z-10">
+    <div className="min-h-screen w-full bg-slate-50">
+      <div className="grid grid-cols-1 xl:grid-cols-[3fr_1fr] min-h-screen w-full">
+        <section className="h-screen flex flex-col">
+          <div className="bg-emerald-50 border-b border-emerald-100 p-4 relative overflow-hidden shrink-0">
+           
+            
+            <div className="relative z-10 flex items-center gap-3">
+             
               <div>
-                <div className="inline-flex items-center gap-2 text-xs uppercase tracking-wider bg-white/15 px-3 py-1 rounded-full mb-3">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  Customer Kiosk Dashboard
-                </div>
-                <h1 className="text-3xl md:text-4xl font-bold">Order Now</h1>
-                <p className="text-emerald-100 mt-1">
+                <h1 className="text-xl font-bold text-emerald-950">Select Your Dish</h1>
+                <p className="text-emerald-700 text-xs">
                   Browse meals, customize your cart, and checkout fast.
                 </p>
               </div>
-              <div className="grid grid-cols-3 gap-2 md:gap-3 text-center min-w-[260px]">
-                <div className="rounded-2xl bg-white/10 px-3 py-3">
-                  <p className="text-xs text-emerald-100">Menu Items</p>
-                  <p className="text-xl font-bold">
-                    {availableProducts.length}
-                  </p>
-                </div>
-                <div className="rounded-2xl bg-white/10 px-3 py-3">
-                  <p className="text-xs text-emerald-100">In Cart</p>
-                  <p className="text-xl font-bold">{cartItemsCount}</p>
-                </div>
-                <div className="rounded-2xl bg-white/10 px-3 py-3">
-                  <p className="text-xs text-emerald-100">Current Total</p>
-                  <p className="text-xl font-bold">{formatCurrency(total)}</p>
-                </div>
-              </div>
             </div>
-          </div> */}
+          </div>
 
-          <div className="bg-white  border border-emerald-100 shadow-sm p-4 md:p-5">
+          <div className="bg-white border text-left border-emerald-100 shadow-sm p-4 md:p-5 flex-1 overflow-y-auto">
             <div className="flex gap-2 overflow-x-auto pb-1 mb-4 items-center">
               {categories.map((cat) => (
                 <button
@@ -235,7 +215,7 @@ export default function POSPage() {
           </div>
         </section>
 
-        <aside className="bg-white border-l border-emerald-100 shadow-sm flex flex-col overflow-hidden xl:sticky xl:top-16 xl:h-[calc(100vh-4rem)]">
+        <aside className="bg-white border-l border-emerald-100 shadow-sm flex flex-col overflow-hidden xl:sticky xl:top-0 xl:h-screen">
           <div className="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <ShoppingCart className="w-5 h-5 text-emerald-600" />
@@ -272,34 +252,33 @@ export default function POSPage() {
                 {cart.map((item) => (
                   <div
                     key={item.product.id}
-                    className="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex overflow-hidden"
+                    className="bg-white relative rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex overflow-hidden"
                   >
-                    <div className="flex gap-3 p-4 flex-1">
-                      <div className="relative shrink-0">
-                        <img
-                          src={item.product.image}
-                          alt={item.product.name}
-                          className="w-20 h-20 rounded-lg object-cover"
-                        />
-                        <span className="absolute -top-2 -right-2 text-xs font-bold text-white bg-emerald-600 px-2 py-1 rounded-full shadow-md">
-                          x{item.quantity}
-                        </span>
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <h4 className="font-semibold text-sm text-slate-900 mb-1">
-                          {item.product.name}
-                        </h4>
-                        <p className="text-xs text-slate-500 mb-2">
-                          {formatCurrency(item.product.price)} each
-                        </p>
-                        <p className="text-sm font-bold text-emerald-600">
-                          {formatCurrency(item.product.price * item.quantity)}
-                        </p>
-                      </div>
+                    <span className="absolute top-0 right-0 text-xs font-bold text-white bg-emerald-600 px-2 py-1 rounded-bl-xl z-10">
+                      x{item.quantity}
+                    </span>
+                    
+                    <div className="w-24 relative shrink-0">
+                      <img
+                        src={item.product.image}
+                        alt={item.product.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-1 p-3 min-w-0 flex flex-col justify-center">
+                      <h4 className="font-semibold text-sm text-slate-900 mb-0.5 truncate">
+                        {item.product.name}
+                      </h4>
+                      <p className="text-xs text-slate-500 mb-1">
+                        {formatCurrency(item.product.price)} each
+                      </p>
+                      <p className="text-sm font-bold text-emerald-600">
+                        {formatCurrency(item.product.price * item.quantity)}
+                      </p>
                     </div>
                     <button
                       onClick={() => removeFromCart(item.product.id)}
-                      className="w-12 flex items-center justify-center bg-transparent hover:bg-red-50 text-red-600   rounded-lg transition-colors shrink-0"
+                      className="w-12 flex items-center justify-center bg-transparent hover:bg-red-50 text-red-600 transition-colors shrink-0"
                     >
                       <Trash2 className="w-5 h-5" />
                     </button>

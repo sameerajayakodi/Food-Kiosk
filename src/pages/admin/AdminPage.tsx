@@ -39,7 +39,7 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-b from-slate-50 to-slate-100 flex">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 flex">
       <aside
         className={`${sidebarOpen ? "w-72" : "w-24"} border-r border-slate-200 bg-white/90 backdrop-blur-sm transition-all duration-300 flex flex-col`}
       >
@@ -105,14 +105,6 @@ export default function AdminPage() {
       </aside>
 
       <main className="flex-1 min-w-0">
-        <div className="px-4 md:px-8 py-4 border-b border-slate-200 bg-white/70 backdrop-blur-sm">
-          <p className="text-xs uppercase tracking-wider text-slate-500">
-            Administration
-          </p>
-          <h1 className="text-xl md:text-2xl font-bold text-slate-900">
-            Restaurant Operations
-          </h1>
-        </div>
         <Outlet />
       </main>
     </div>

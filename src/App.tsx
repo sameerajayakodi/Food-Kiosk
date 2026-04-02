@@ -1,5 +1,4 @@
 import { Navigate, Route, Routes } from "react-router-dom";
-import Navbar from "./components/Navbar";
 import ToastContainer from "./components/ToastContainer";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminEmployees from "./pages/admin/AdminEmployees";
@@ -12,7 +11,6 @@ import POSPage from "./pages/pos/POSPage";
 export default function App() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-sans">
-      <Navbar />
       <ToastContainer />
       <Routes>
         <Route path="/" element={<POSPage />} />
