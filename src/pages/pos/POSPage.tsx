@@ -34,6 +34,13 @@ export default function POSPage() {
     total: number;
   } | null>(null);
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good Morning";
+    if (hour < 17) return "Good Afternoon";
+    return "Good Evening";
+  };
+
   const availableProducts = useMemo(
     () => products.filter((p) => p.available),
     [products],
@@ -120,19 +127,24 @@ export default function POSPage() {
     <div className="min-h-screen w-full bg-slate-50">
       <div className="grid grid-cols-1 xl:grid-cols-[3fr_1fr] min-h-screen w-full">
         <section className="h-screen flex flex-col">
-          {/* <div className="bg-emerald-50  border-b border-emerald-100 p-4 relative overflow-hidden shrink-0">
-           
-            
-            <div className="relative z-10 flex  items-center gap-3">
-             
-              <div >
-                <h1 className="text-xl font-bold text-emerald-950">Select Your Dish</h1>
-                <p className="text-emerald-700 text-xs">
+          <div className="bg-white border-b border-slate-200 px-5 py-3 shrink-0 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-1.5 bg-emerald-100 rounded-lg">
+                <UtensilsCrossed className="w-5 h-5 text-emerald-600" />
+              </div>
+              <div>
+                <h1 className="text-lg font-bold text-slate-900 leading-tight">Welcome! Select Your Dish</h1>
+                <p className="text-xs text-slate-500">
                   Browse meals, customize your cart, and checkout fast.
                 </p>
               </div>
             </div>
-          </div> */}
+            <div className="hidden md:block">
+               <span className="text-xs font-semibold bg-slate-100 text-slate-600 px-3 py-1.5 rounded-full border border-slate-200">
+                  {getGreeting()} ☀️
+               </span>
+            </div>
+          </div>
 
           <div className="bg-white border text-left border-emerald-100 shadow-sm p-4 md:p-5 flex-1 overflow-y-auto">
             <div className="flex gap-2 overflow-x-auto pb-1 mb-4 items-center">
