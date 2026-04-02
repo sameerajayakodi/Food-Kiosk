@@ -6,9 +6,7 @@ import {
   Trash2,
   UtensilsCrossed,
 } from "lucide-react";
-import { QRCodeSVG } from "qrcode.react";
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useStore } from "../../store/useStore";
 import type { Category } from "../../types";
 import { formatCurrency } from "../../utils/helpers";
@@ -22,17 +20,12 @@ const categoryEmojis: Record<Category, string> = {
   "Side Dishes": "🍟",
 };
 
-export default function POSPage() {
+export default function KioskPage() {
   const { products, cart, addToCart, removeFromCart, clearCart, placeOrder } =
     useStore();
 
-  const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState<Category>("Breakfast");
   const [searchQuery, setSearchQuery] = useState("");
-  const [orderResult, setOrderResult] = useState<{
-    orderId: string;
-    total: number;
-  } | null>(null);
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -65,63 +58,8 @@ export default function POSPage() {
   const total = cartSubtotal + tax;
 
   const handlePlaceOrder = () => {
-    const order = placeOrder();
-    if (order) {
-      setOrderResult({ orderId: order.id, total: order.total });
-    }
+    placeOrder();
   };
-
-  if (orderResult) {
-    return (
-      <div className="min-h-screen w-full bg-slate-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-3xl shadow-xl p-8 max-w-md w-full text-center border border-emerald-200">
-          <div className="w-20 h-20 bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-full flex items-center justify-center mx-auto mb-4">
-            <CreditCard className="w-10 h-10 text-white" />
-          </div>
-          <h2 className="text-2xl font-bold text-emerald-900 mb-1">
-            Order Placed!
-          </h2>
-          <p className="text-slate-600 mb-6">Show this QR on payment counter</p>
-
-          <div className="bg-slate-50 rounded-2xl p-6 mb-6">
-            <p className="text-sm text-slate-600 mb-1">Order ID</p>
-            <p className="text-2xl font-bold text-emerald-900 mb-4">
-              {orderResult.orderId}
-            </p>
-
-            <div className="bg-white p-4 rounded-2xl inline-block shadow-sm mb-4">
-              <QRCodeSVG
-                value={`${window.location.origin}/payment/${orderResult.orderId}`}
-                size={180}
-                fgColor="#047857"
-                bgColor="#FFFFFF"
-              />
-            </div>
-
-            <p className="text-sm text-slate-600 mb-1">Total Amount</p>
-            <p className="text-3xl font-bold text-emerald-600">
-              {formatCurrency(orderResult.total)}
-            </p>
-          </div>
-
-          <div className="flex gap-3 mt-4">
-            <button
-              onClick={() => setOrderResult(null)}
-              className="flex-1 py-3 rounded-2xl bg-emerald-100 text-emerald-700 font-semibold hover:bg-emerald-200 transition-colors"
-            >
-              New Order
-            </button>
-            <button
-              onClick={() => navigate(`/payment/${orderResult.orderId}`)}
-              className="flex-1 py-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-semibold hover:shadow-lg transition-shadow"
-            >
-              Payment Page
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen w-full bg-slate-50">
