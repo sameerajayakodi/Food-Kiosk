@@ -120,19 +120,19 @@ export default function POSPage() {
     <div className="min-h-screen w-full bg-slate-50">
       <div className="grid grid-cols-1 xl:grid-cols-[3fr_1fr] min-h-screen w-full">
         <section className="h-screen flex flex-col">
-          <div className="bg-emerald-50 border-b border-emerald-100 p-4 relative overflow-hidden shrink-0">
+          {/* <div className="bg-emerald-50  border-b border-emerald-100 p-4 relative overflow-hidden shrink-0">
            
             
-            <div className="relative z-10 flex items-center gap-3">
+            <div className="relative z-10 flex  items-center gap-3">
              
-              <div>
+              <div >
                 <h1 className="text-xl font-bold text-emerald-950">Select Your Dish</h1>
                 <p className="text-emerald-700 text-xs">
                   Browse meals, customize your cart, and checkout fast.
                 </p>
               </div>
             </div>
-          </div>
+          </div> */}
 
           <div className="bg-white border text-left border-emerald-100 shadow-sm p-4 md:p-5 flex-1 overflow-y-auto">
             <div className="flex gap-2 overflow-x-auto pb-1 mb-4 items-center">

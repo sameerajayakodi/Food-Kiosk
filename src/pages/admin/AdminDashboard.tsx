@@ -57,12 +57,7 @@ export default function AdminDashboard() {
     [paidOrders],
   );
 
-  const averageOrderValue =
-    paidOrders.length > 0 ? totalRevenue / paidOrders.length : 0;
-
-  const activeEmployees = employees.filter(
-    (employee) => employee.active,
-  ).length;
+  const pendingOrdersCount = orders.filter(o => o.status === "Pending" || o.status === "Preparing").length;
   const activeProducts = products.filter((product) => product.available).length;
 
   const categoryStatsRaw = useMemo(() => {
@@ -90,15 +85,10 @@ export default function AdminDashboard() {
   // DUMMY DATA FALLBACK LOGIC
   const isDemo = orders.length === 0;
 
-  const d_todayOrdersLength = isDemo ? 84 : todayOrders.length.toString();
-  const d_todayRevenue = isDemo ? 2154.50 : todayRevenue;
-  const d_activeStaff = isDemo ? "6" : activeEmployees.toString();
-  const d_activeProducts = isDemo ? "32" : activeProducts.toString();
-
-  const d_totalRevenue = isDemo ? 34215.80 : totalRevenue;
+  const d_totalRevenue = isDemo ? 3421500.80 : totalRevenue;
   const d_totalOrders = isDemo ? "1,245" : orders.length.toString();
-  const d_avgTicket = isDemo ? 2750.00 : averageOrderValue;
-  const d_staffCoverage = isDemo ? "4/4" : `${activeEmployees}/${employees.length}`;
+  const d_activeMenu = isDemo ? "32" : activeProducts.toString();
+  const d_pendingOrders = isDemo ? "12" : pendingOrdersCount.toString();
 
   const categoryStats = isDemo ? [
     { name: "Breakfast", value: 4500 },
@@ -159,15 +149,15 @@ export default function AdminDashboard() {
           color="blue"
         />
         <StatCard
-          title="Avg Ticket"
-          value={formatCurrency(d_avgTicket)}
-          icon={Activity}
+          title="Active Menu"
+          value={d_activeMenu}
+          icon={Package}
           color="violet"
         />
         <StatCard
-          title="Coverage"
-          value={d_staffCoverage}
-          icon={Users}
+          title="Pending Orders"
+          value={d_pendingOrders}
+          icon={Clock}
           color="amber"
         />
       </section>
