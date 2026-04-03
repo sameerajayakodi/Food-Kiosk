@@ -266,7 +266,7 @@ export default function KioskPage() {
                 onClick={handlePlaceOrder}
                 className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-bold shadow-lg hover:shadow-xl transition-all active:scale-[0.98]"
               >
-                Place Order
+                Print Bill
               </button>
             </div>
           )}
