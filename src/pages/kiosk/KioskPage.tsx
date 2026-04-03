@@ -27,6 +27,8 @@ export default function KioskPage() {
   const [activeCategory, setActiveCategory] = useState<Category>("Breakfast");
   const [searchQuery, setSearchQuery] = useState("");
 
+  const mainCategories: Category[] = ["Breakfast", "Lunch", "Dinner"];
+
   const getGreeting = () => {
     const hour = new Date().getHours();
     if (hour < 12) return "Good Morning";
@@ -49,6 +51,16 @@ export default function KioskPage() {
     [availableProducts, activeCategory, searchQuery],
   );
 
+  const filteredSideDishes = useMemo(
+    () =>
+      availableProducts.filter(
+        (p) =>
+          p.category === "Side Dishes" &&
+          p.name.toLowerCase().includes(searchQuery.toLowerCase()),
+      ),
+    [availableProducts, searchQuery],
+  );
+
   const cartItemsCount = cart.reduce((sum, item) => sum + item.quantity, 0);
   const cartSubtotal = cart.reduce(
     (sum, item) => sum + item.product.price * item.quantity,
@@ -64,7 +76,7 @@ export default function KioskPage() {
   return (
     <div className="min-h-screen w-full bg-slate-50">
       <div className="grid grid-cols-1 xl:grid-cols-[3fr_1fr] min-h-screen w-full">
-        <section className="h-screen flex flex-col">
+        <section className="flex flex-col">
           <div className="bg-white border-b border-slate-200 px-5 py-3 shrink-0 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="p-1.5 bg-emerald-100 rounded-lg">
@@ -84,84 +96,129 @@ export default function KioskPage() {
             </div>
           </div>
 
-          <div className="bg-white border text-left border-emerald-100 shadow-sm p-4 md:p-5 flex-1 overflow-y-auto">
-            <div className="flex gap-2 overflow-x-auto pb-1 mb-4 items-center">
-              {categories.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setActiveCategory(cat)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all
-                    ${
-                      activeCategory === cat
-                        ? "bg-emerald-600 text-white shadow"
-                        : "bg-slate-100 text-slate-700 hover:bg-emerald-50 border border-slate-200"
-                    }`}
-                >
-                  <span>{categoryEmojis[cat]}</span>
-                  {cat}
-                </button>
-              ))}
+          <div className="bg-white border text-left border-emerald-100 shadow-sm p-4 md:p-5">
+            {/* Two Column Layout */}
+            <div className="flex gap-6">
+              {/* Left Column: Main Menu */}
+              <div className="flex-[2]">
+                {/* Main Menu Title + Category Tabs */}
+                <div className="flex gap-3 items-center pb-3 mb-4">
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="text-xl">🍴</span>
+                    <h2 className="text-lg font-bold text-slate-900">Main Menu</h2>
+                  </div>
+                  {mainCategories.map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => setActiveCategory(cat)}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all
+                        ${
+                          activeCategory === cat
+                            ? "bg-emerald-600 text-white shadow"
+                            : "bg-slate-100 text-slate-700 hover:bg-emerald-50 border border-slate-200"
+                        }`}
+                    >
+                      <span>{categoryEmojis[cat]}</span>
+                      {cat}
+                    </button>
+                  ))}
+                </div>
 
-              <div className="ml-auto relative w-80">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                <input
-                  type="text"
-                  placeholder="Search items..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all text-sm"
-                />
+                {/* Main Menu Cards - 3 per row */}
+                <div className="grid grid-cols-3 gap-3 md:gap-4">
+                  {filteredProducts.map((product) => (
+                    <button
+                      key={product.id}
+                      onClick={() => addToCart(product)}
+                      className="bg-white rounded-2xl overflow-hidden border border-slate-200 hover:border-emerald-300 shadow-sm hover:shadow-lg transition-all text-left group"
+                    >
+                      <div className="h-28 overflow-hidden relative">
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                        />
+                        {product.popular && (
+                          <span className="absolute top-2 left-2 text-[10px] font-semibold bg-amber-100 text-amber-800 px-2 py-1 rounded-full">
+                            Popular
+                          </span>
+                        )}
+                      </div>
+                      <div className="p-3">
+                        <p className="text-[11px] text-slate-500 mb-1">
+                          {product.category}
+                        </p>
+                        <h3 className="font-semibold text-sm text-slate-900 truncate">
+                          {product.name}
+                        </h3>
+
+                        <div className="mt-2 flex items-center justify-between gap-2">
+                          <p className="text-emerald-600 font-bold text-sm">
+                            {formatCurrency(product.price)}
+                          </p>
+                          <span className="text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-lg transition-colors">
+                            + Add
+                          </span>
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+
+                {filteredProducts.length === 0 && (
+                  <div className="text-center py-12">
+                    <p className="text-4xl mb-2">🔍</p>
+                    <p className="text-slate-600">No menu items found.</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Right Column: Side Dishes */}
+              <div className="flex-1 border-l border-slate-200 pl-6">
+                <div className="mb-4 flex items-center gap-2">
+                  <span className="text-xl">{categoryEmojis["Side Dishes"]}</span>
+                  <h2 className="text-lg font-bold text-slate-900">Side Dishes</h2>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {filteredSideDishes.map((product) => (
+                    <button
+                      key={product.id}
+                      onClick={() => addToCart(product)}
+                      className="bg-white rounded-2xl overflow-hidden border border-slate-200 hover:border-emerald-300 shadow-sm hover:shadow-lg transition-all text-left group"
+                    >
+                      <div className="h-28 overflow-hidden relative">
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                        />
+                      </div>
+                      <div className="p-3">
+                        <h3 className="font-semibold text-sm text-slate-900 truncate">
+                          {product.name}
+                        </h3>
+
+                        <div className="mt-2 flex items-center justify-between gap-2">
+                          <p className="text-emerald-600 font-bold text-sm">
+                            {formatCurrency(product.price)}
+                          </p>
+                          <span className="text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-lg transition-colors">
+                            Add
+                          </span>
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+
+                {filteredSideDishes.length === 0 && (
+                  <div className="text-center py-12 border border-dashed border-slate-200 rounded-xl">
+                    <p className="text-slate-400 text-sm">No side dishes found.</p>
+                  </div>
+                )}
               </div>
             </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4">
-              {filteredProducts.map((product) => (
-                <button
-                  key={product.id}
-                  onClick={() => addToCart(product)}
-                  className="bg-white rounded-2xl overflow-hidden border border-slate-200 hover:border-emerald-300 shadow-sm hover:shadow-lg transition-all text-left group"
-                >
-                  <div className="h-28 overflow-hidden relative">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                    />
-                    {product.popular && (
-                      <span className="absolute top-2 left-2 text-[10px] font-semibold bg-amber-100 text-amber-800 px-2 py-1 rounded-full">
-                        Popular
-                      </span>
-                    )}
-                  </div>
-                  <div className="p-3">
-                    <p className="text-[11px] text-slate-500 mb-1">
-                      {product.category}
-                    </p>
-                    <h3 className="font-semibold text-sm text-slate-900 truncate">
-                      {product.name}
-                    </h3>
-                    <p className="text-xs text-slate-500 line-clamp-2 h-8 mt-1">
-                      {product.description}
-                    </p>
-                    <div className="mt-2 flex items-center justify-between gap-2">
-                      <p className="text-emerald-600 font-bold text-sm">
-                        {formatCurrency(product.price)}
-                      </p>
-                      <span className="text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-lg transition-colors">
-                        + Add
-                      </span>
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
-
-            {filteredProducts.length === 0 && (
-              <div className="text-center py-12">
-                <p className="text-4xl mb-2">🔍</p>
-                <p className="text-slate-600">No menu items found.</p>
-              </div>
-            )}
           </div>
         </section>
 
