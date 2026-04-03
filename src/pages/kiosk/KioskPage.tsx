@@ -174,8 +174,8 @@ export default function KioskPage() {
               </div>
 
               {/* Right Column: Side Dishes */}
-              <div className="flex-1 border-l border-slate-200 pl-6">
-                <div className="mb-4 flex items-center gap-2">
+              <div className="flex-1 bg-slate-50/80 rounded-2xl p-5 border border-slate-100 ml-2">
+                <div className="mb-5 flex items-center gap-2">
                   <span className="text-xl">{categoryEmojis["Side Dishes"]}</span>
                   <h2 className="text-lg font-bold text-slate-900">Side Dishes</h2>
                 </div>

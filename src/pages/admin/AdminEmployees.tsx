@@ -177,9 +177,9 @@ export default function AdminEmployees() {
                 Employee
               </th>
 
-              <th className="text-left px-6 py-4 text-sm font-semibold text-slate-700">
+              {/* <th className="text-left px-6 py-4 text-sm font-semibold text-slate-700">
                 Contact
-              </th>
+              </th> */}
               <th className="text-left px-6 py-4 text-sm font-semibold text-slate-700">
                 Credit Limit
               </th>
@@ -211,12 +211,12 @@ export default function AdminEmployees() {
                   </div>
                 </td>
 
-                <td className="px-6 py-4">
+                {/* <td className="px-6 py-4">
                   <div className="text-sm text-slate-900 font-medium">
                     {employee.phone}
                   </div>
                   <div className="text-sm text-slate-500">{employee.email}</div>
-                </td>
+                </td> */}
                 <td className="px-6 py-4 font-semibold text-slate-900">
                   {formatCurrency(employee.creditLimit)}
                 </td>

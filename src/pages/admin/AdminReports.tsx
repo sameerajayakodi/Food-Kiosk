@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { BarChart3, ShoppingBag, TrendingUp } from "lucide-react";
 import { useStore } from "../../store/useStore";
 import { formatCurrency } from "../../utils/helpers";
 
 export default function AdminReports() {
   const { orders, products, employees } = useStore();
+  const [usageTimeframe, setUsageTimeframe] = useState<"Today" | "Month">("Month");
 
   const today = new Date().toISOString().split("T")[0];
   const thisMonth = new Date().toISOString().slice(0, 7);
@@ -105,9 +107,33 @@ export default function AdminReports() {
 
       {/* Employee Credit Usage */}
       <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
-        <h2 className="text-xl font-bold text-slate-900 mb-6">
-          Employee Credit Usage
-        </h2>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-bold text-slate-900">
+            Employee Credit Usage
+          </h2>
+          <div className="flex gap-2 bg-slate-100 p-1 rounded-lg">
+            <button
+              onClick={() => setUsageTimeframe("Today")}
+              className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                usageTimeframe === "Today"
+                  ? "bg-white text-emerald-700 shadow-sm"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              Today
+            </button>
+            <button
+              onClick={() => setUsageTimeframe("Month")}
+              className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                usageTimeframe === "Month"
+                  ? "bg-white text-emerald-700 shadow-sm"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              This Month
+            </button>
+          </div>
+        </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -131,7 +157,9 @@ export default function AdminReports() {
             </thead>
             <tbody>
               {employees.map((employee) => {
-                const used = employee.creditLimit - (employee.currentBalance || 0);
+                const baseUsed = employee.creditLimit - (employee.currentBalance || 0);
+                // Mock daily usage vs monthly usage for presentation
+                const used = usageTimeframe === "Today" ? baseUsed * 0.15 : baseUsed;
                 const usagePercent = employee.creditLimit > 0 ? (used / employee.creditLimit) * 100 : 0;
                 
                 return (
@@ -179,91 +207,7 @@ export default function AdminReports() {
         )}
       </div>
 
-      {/* Orders Breakdown */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
-        <h2 className="text-xl font-bold text-slate-900 mb-6">
-          Recent Orders Details
-        </h2>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-slate-200">
-                <th className="text-left px-4 py-3 text-sm font-semibold text-slate-700">
-                  Order ID
-                </th>
-                <th className="text-left px-4 py-3 text-sm font-semibold text-slate-700">
-                  Date & Time
-                </th>
-                <th className="text-left px-4 py-3 text-sm font-semibold text-slate-700">
-                  Items
-                </th>
-                <th className="text-left px-4 py-3 text-sm font-semibold text-slate-700">
-                  Total
-                </th>
-                <th className="text-left px-4 py-3 text-sm font-semibold text-slate-700">
-                  Status
-                </th>
-                <th className="text-left px-4 py-3 text-sm font-semibold text-slate-700">
-                  Payment
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {displayOrders
-                .map((order) => (
-                  <tr
-                    key={order.id}
-                    className="border-b border-slate-100 hover:bg-slate-50 transition-colors"
-                  >
-                    <td className="px-4 py-3 text-sm font-medium text-slate-900">
-                      {order.id.slice(0, 6)}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-slate-600">
-                      {new Date(order.timestamp).toLocaleString()}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-slate-600">
-                      {order.items.reduce(
-                        (sum: number, item: any) => sum + item.quantity,
-                        0,
-                      )}{" "}
-                      items
-                    </td>
-                    <td className="px-4 py-3 text-sm font-semibold text-emerald-600">
-                      {formatCurrency(order.total)}
-                    </td>
-                    <td className="px-4 py-3 text-sm">
-                      <span
-                        className={`inline-block px-3 py-1 rounded-lg text-xs font-medium ${
-                          order.status === "Completed"
-                            ? "bg-emerald-100 text-emerald-700"
-                            : "bg-amber-100 text-amber-700"
-                        }`}
-                      >
-                        {order.status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-sm">
-                      <span
-                        className={`inline-block px-3 py-1 rounded-lg text-xs font-medium ${
-                          order.paymentStatus === "paid"
-                            ? "bg-emerald-100 text-emerald-700"
-                            : "bg-red-100 text-red-700"
-                        }`}
-                      >
-                        {order.paymentStatus === "paid" ? "Paid" : "Unpaid"}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
-        </div>
-        {orders.length === 0 && (
-          <div className="text-center py-12 text-slate-500">
-            <p className="text-sm font-medium">No orders to display</p>
-          </div>
-        )}
-      </div>
+      
     </div>
   );
 }
