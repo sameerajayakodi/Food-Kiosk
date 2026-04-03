@@ -46,51 +46,12 @@ export default function AdminReports() {
     };
   };
 
-  const getPopularProducts = () => {
-    const productSells: Record<string, number> = {};
-    orders.forEach((order) => {
-      order.items.forEach((item) => {
-        productSells[item.product.id] =
-          (productSells[item.product.id] || 0) + item.quantity;
-      });
-    });
 
-    return Object.entries(productSells)
-      .map(([id, qty]) => ({
-        product: products.find((p) => p.id === id),
-        quantity: qty,
-      }))
-      .filter((item) => item.product)
-      .sort((a, b) => b.quantity - a.quantity)
-      .slice(0, 10);
-  };
-
-  const getCategorySales = () => {
-    const categorySales: Record<string, { count: number; revenue: number }> =
-      {};
-    orders
-      .filter((o) => o.paymentStatus === "paid")
-      .forEach((order) => {
-        order.items.forEach((item) => {
-          const cat = item.product.category;
-          if (!categorySales[cat]) {
-            categorySales[cat] = { count: 0, revenue: 0 };
-          }
-          categorySales[cat].count += item.quantity;
-          categorySales[cat].revenue += item.product.price * item.quantity;
-        });
-      });
-    return Object.entries(categorySales).map(([category, data]) => ({
-      category,
-      ...data,
-    }));
-  };
 
   const today_statsRaw = getTodayStats();
   const month_statsRaw = getMonthStats();
   const total_statsRaw = getTotalStats();
-  const popularRaw = getPopularProducts();
-  const categoriesRaw = getCategorySales();
+
 
   const isDemo = orders.length === 0;
 
@@ -98,20 +59,7 @@ export default function AdminReports() {
   const month_stats = isDemo ? { orders: 2450, revenue: 64120.00, avgOrderValue: 26.17 } : month_statsRaw;
   const total_stats = isDemo ? { orders: 12450, revenue: 325410.25, avgOrderValue: 26.13 } : total_statsRaw;
 
-  const popular = isDemo ? [
-    { product: { id: "p1", name: "Classic Burger", category: "Lunch", price: 12.50 }, quantity: 450 },
-    { product: { id: "p2", name: "Pancakes", category: "Breakfast", price: 8.50 }, quantity: 380 },
-    { product: { id: "p3", name: "Pasta Carbonara", category: "Dinner", price: 18.00 }, quantity: 320 },
-    { product: { id: "p4", name: "French Fries", category: "Side Dishes", price: 4.50 }, quantity: 295 },
-    { product: { id: "p5", name: "Grilled Salmon", category: "Dinner", price: 24.00 }, quantity: 180 },
-  ] as any[] : popularRaw;
 
-  const categories = isDemo ? [
-    { category: "Lunch", count: 850, revenue: 12400 },
-    { category: "Dinner", count: 1200, revenue: 25300 },
-    { category: "Breakfast", count: 650, revenue: 6500 },
-    { category: "Side Dishes", count: 420, revenue: 3100 },
-  ] : categoriesRaw;
 
   const displayOrders = isDemo ? [
     { id: "ORD-99X21", timestamp: new Date().toISOString(), items: [{quantity:2}, {quantity:1}], total: 42.50, status: "Completed", paymentStatus: "paid" },
@@ -127,12 +75,12 @@ export default function AdminReports() {
           Reports & Analytics
         </h1>
         <p className="text-slate-600 mt-1">
-          Business performance metrics and insights
+          Employee catering metrics and credit usage
         </p>
       </div>
 
-      {/* Stats Overview - 3 tabs: Today, This Month, Total */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Stats Overview - 2 tabs: Today, This Month */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <ReportCard
           title="Today"
           icon={ShoppingBag}
@@ -151,110 +99,84 @@ export default function AdminReports() {
             avgOrder: month_stats.avgOrderValue,
           }}
         />
-        <ReportCard
-          title="All Time"
-          icon={BarChart3}
-          stats={{
-            orders: total_stats.orders,
-            revenue: total_stats.revenue,
-            avgOrder: total_stats.avgOrderValue,
-          }}
-        />
       </div>
 
-      {/* Two Column Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Popular Products */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
-          <h2 className="text-xl font-bold text-slate-900 mb-6">
-            Top 10 Popular Products
-          </h2>
-          <div className="space-y-4">
-            {popular.length > 0 ? (
-              popular.map((item, idx) => (
-                <div
-                  key={item.product?.id}
-                  className="flex items-center justify-between pb-4 border-b border-slate-100 last:border-0"
-                >
-                  <div className="flex items-center gap-4 flex-1">
-                    <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center font-bold text-slate-700">
-                      {idx + 1}
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-semibold text-slate-900">
-                        {item.product?.name}
-                      </p>
-                      <p className="text-xs text-slate-500">
-                        {item.product?.category}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold text-slate-900">{item.quantity}x</p>
-                    <p className="text-xs text-slate-500">
-                      {formatCurrency(item.product?.price || 0)}
-                    </p>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p className="text-center text-slate-500 py-8">
-                No sales data yet
-              </p>
-            )}
-          </div>
-        </div>
 
-        {/* Sales by Category */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
-          <h2 className="text-xl font-bold text-slate-900 mb-6">
-            Sales by Category
-          </h2>
-          <div className="space-y-4">
-            {categories.length > 0 ? (
-              categories
-                .sort((a, b) => b.revenue - a.revenue)
-                .map((item) => (
-                  <div
-                    key={item.category}
-                    className="pb-4 border-b border-slate-100 last:border-0"
+
+      {/* Employee Credit Usage */}
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+        <h2 className="text-xl font-bold text-slate-900 mb-6">
+          Employee Credit Usage
+        </h2>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-slate-200">
+                <th className="text-left px-4 py-3 text-sm font-semibold text-slate-700">
+                  Employee
+                </th>
+                <th className="text-left px-4 py-3 text-sm font-semibold text-slate-700">
+                  Credit Limit
+                </th>
+                <th className="text-left px-4 py-3 text-sm font-semibold text-slate-700">
+                  Current Balance
+                </th>
+                <th className="text-left px-4 py-3 text-sm font-semibold text-slate-700">
+                  Credit Used
+                </th>
+                <th className="text-left px-4 py-3 text-sm font-semibold text-slate-700">
+                  Usage %
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {employees.map((employee) => {
+                const used = employee.creditLimit - (employee.currentBalance || 0);
+                const usagePercent = employee.creditLimit > 0 ? (used / employee.creditLimit) * 100 : 0;
+                
+                return (
+                  <tr
+                    key={employee.id}
+                    className="border-b border-slate-100 hover:bg-slate-50 transition-colors"
                   >
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="font-semibold text-slate-900">
-                        {item.category}
-                      </p>
-                      <p className="font-bold text-emerald-600">
-                        {formatCurrency(item.revenue)}
-                      </p>
-                    </div>
-                    <div className="flex items-center justify-between text-xs text-slate-500">
-                      <span>{item.count} items sold</span>
-                      <span>
-                        {total_stats.revenue > 0
-                          ? Math.round(
-                              (item.revenue / total_stats.revenue) * 100,
-                            )
-                          : 0}
-                        % of revenue
-                      </span>
-                    </div>
-                    <div className="mt-2 h-2 bg-slate-100 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-emerald-500 rounded-full transition-all"
-                        style={{
-                          width: `${total_stats.revenue > 0 ? (item.revenue / total_stats.revenue) * 100 : 0}%`,
-                        }}
-                      />
-                    </div>
-                  </div>
-                ))
-            ) : (
-              <p className="text-center text-slate-500 py-8">
-                No sales data yet
-              </p>
-            )}
-          </div>
+                    <td className="px-4 py-3 text-sm font-medium text-slate-900">
+                      {employee.name}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-slate-600">
+                      {formatCurrency(employee.creditLimit)}
+                    </td>
+                    <td className="px-4 py-3 text-sm font-semibold text-emerald-600">
+                      {formatCurrency(employee.currentBalance || 0)}
+                    </td>
+                    <td className="px-4 py-3 text-sm font-semibold text-amber-600">
+                      {formatCurrency(used)}
+                    </td>
+                    <td className="px-4 py-3 text-sm">
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden w-24">
+                          <div
+                            className={`h-full rounded-full transition-all ${
+                              usagePercent > 80 ? "bg-red-500" : usagePercent > 50 ? "bg-amber-500" : "bg-emerald-500"
+                            }`}
+                            style={{ width: `${Math.min(100, Math.max(0, usagePercent))}%` }}
+                          />
+                        </div>
+                        <span className="text-xs font-medium text-slate-600 w-8">
+                          {Math.round(usagePercent)}%
+                        </span>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
+        {employees.length === 0 && (
+          <div className="text-center py-12 text-slate-500">
+            <p className="text-sm font-medium">No employee records to display</p>
+          </div>
+        )}
       </div>
 
       {/* Orders Breakdown */}
@@ -365,9 +287,9 @@ function ReportCard({
       </div>
       <div className="space-y-4">
         <StatRow label="Total Orders" value={stats.orders.toString()} />
-        <StatRow label="Revenue" value={formatCurrency(stats.revenue)} />
+        <StatRow label="Credits Used" value={formatCurrency(stats.revenue)} />
         <StatRow
-          label="Avg Order Value"
+          label="Avg Credits / Order"
           value={formatCurrency(stats.avgOrder)}
         />
       </div>

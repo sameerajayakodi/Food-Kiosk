@@ -23,10 +23,10 @@ export interface Employee {
   name: string;
   email: string;
   phone: string;
-  position: 'Manager' | 'Cashier' | 'Cook' | 'Delivery';
+
   joinDate: string;
-  salary: number;
-  points: number;
+  creditLimit: number;
+  currentBalance: number;
   active: boolean;
 }
 

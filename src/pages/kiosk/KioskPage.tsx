@@ -21,8 +21,9 @@ const categoryEmojis: Record<Category, string> = {
 };
 
 export default function KioskPage() {
-  const { products, cart, addToCart, removeFromCart, clearCart, placeOrder } =
+  const { products, cart, addToCart, removeFromCart, clearCart, placeOrder, employees } =
     useStore();
+  const currentEmployee = employees[0];
 
   const [activeCategory, setActiveCategory] = useState<Category>("Breakfast");
   const [searchQuery, setSearchQuery] = useState("");
@@ -66,8 +67,7 @@ export default function KioskPage() {
     (sum, item) => sum + item.product.price * item.quantity,
     0,
   );
-  const tax = cartSubtotal * 0.1;
-  const total = cartSubtotal + tax;
+  const total = cartSubtotal;
 
   const handlePlaceOrder = () => {
     placeOrder();
@@ -83,9 +83,9 @@ export default function KioskPage() {
                 <UtensilsCrossed className="w-5 h-5 text-emerald-600" />
               </div>
               <div>
-                <h1 className="text-lg font-bold text-slate-900 leading-tight">Welcome! Select Your Dish</h1>
+                <h1 className="text-lg font-bold text-slate-900 leading-tight">Welcome, {currentEmployee?.name || "Employee"}!</h1>
                 <p className="text-xs text-slate-500">
-                  Browse meals, customize your cart, and checkout fast.
+                  Credit Limit: {formatCurrency(currentEmployee?.creditLimit || 0)} • Balance: {formatCurrency(currentEmployee?.currentBalance || 0)}
                 </p>
               </div>
             </div>
@@ -299,23 +299,24 @@ export default function KioskPage() {
 
           {cart.length > 0 && (
             <div className="border-t border-slate-200 p-5 bg-slate-50 space-y-3">
+
               <div className="flex justify-between text-sm">
-                <span className="text-slate-600">Subtotal</span>
+                <span className="text-slate-600">Current Balance</span>
                 <span className="font-medium text-slate-900">
-                  {formatCurrency(cartSubtotal)}
+                  {formatCurrency(currentEmployee?.currentBalance || 0)}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-slate-600">Tax (10%)</span>
-                <span className="font-medium text-slate-900">
-                  {formatCurrency(tax)}
+                <span className="text-slate-600">Order Total</span>
+                <span className="font-medium text-red-600">
+                  -{formatCurrency(total)}
                 </span>
               </div>
               <div className="h-px bg-slate-200" />
               <div className="flex justify-between">
-                <span className="font-semibold text-slate-900">Total</span>
-                <span className="text-xl font-bold text-emerald-600">
-                  {formatCurrency(total)}
+                <span className="font-semibold text-slate-900">Remaining</span>
+                <span className={`text-xl font-bold ${((currentEmployee?.currentBalance || 0) - total) >= 0 ? "text-emerald-600" : "text-red-600"}`}>
+                  {formatCurrency((currentEmployee?.currentBalance || 0) - total)}
                 </span>
               </div>
 

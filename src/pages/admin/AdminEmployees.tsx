@@ -8,8 +8,8 @@ interface EmployeeForm {
   name: string;
   email: string;
   phone: string;
-  position: "Manager" | "Cashier" | "Cook" | "Delivery";
-  salary: string;
+
+  creditLimit: string;
   joinDate: string;
   active: boolean;
 }
@@ -18,19 +18,17 @@ const emptyForm: EmployeeForm = {
   name: "",
   email: "",
   phone: "",
-  position: "Cashier",
-  salary: "",
+
+  creditLimit: "",
   joinDate: new Date().toISOString().split("T")[0],
   active: true,
 };
 
 export default function AdminEmployees() {
-  const { employees, addEmployee, updateEmployee, deleteEmployee, topUpEmployeePoints } = useStore();
+  const { employees, addEmployee, updateEmployee, deleteEmployee, topUpEmployeeBalance } = useStore();
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterPosition, setFilterPosition] = useState<
-    "Manager" | "Cashier" | "Cook" | "Delivery" | "All"
-  >("All");
+
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<EmployeeForm>(emptyForm);
@@ -38,7 +36,7 @@ export default function AdminEmployees() {
   const [topUpId, setTopUpId] = useState<string | null>(null);
   const [topUpAmount, setTopUpAmount] = useState("");
 
-  const positions = ["Manager", "Cashier", "Cook", "Delivery"] as const;
+
 
   const filteredEmployees = employees.filter((e) => {
     if (
@@ -47,7 +45,7 @@ export default function AdminEmployees() {
       !e.email.toLowerCase().includes(searchQuery.toLowerCase())
     )
       return false;
-    if (filterPosition !== "All" && e.position !== filterPosition) return false;
+
     return true;
   });
 
@@ -62,8 +60,8 @@ export default function AdminEmployees() {
       name: employee.name,
       email: employee.email,
       phone: employee.phone,
-      position: employee.position,
-      salary: employee.salary.toString(),
+     
+      creditLimit: employee.creditLimit.toString(),
       joinDate: employee.joinDate,
       active: employee.active,
     });
@@ -73,17 +71,17 @@ export default function AdminEmployees() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const salary = parseFloat(form.salary);
-    if (isNaN(salary) || salary < 0) return;
+    const creditLimit = parseFloat(form.creditLimit);
+    if (isNaN(creditLimit) || creditLimit < 0) return;
     if (!form.name.trim() || !form.email.trim()) return;
 
     const employeeData = {
       name: form.name.trim(),
       email: form.email.trim(),
       phone: form.phone.trim(),
-      position: form.position,
-      salary,
-      points: 0,
+    
+      creditLimit,
+      currentBalance: 0,
       joinDate: form.joinDate,
       active: form.active,
     };
@@ -109,14 +107,14 @@ export default function AdminEmployees() {
     if (!topUpId) return;
     const amount = parseInt(topUpAmount, 10);
     if (!isNaN(amount) && amount > 0) {
-      topUpEmployeePoints(topUpId, amount);
+      topUpEmployeeBalance(topUpId, amount);
     }
     setTopUpId(null);
     setTopUpAmount("");
   };
 
   const getTotalPayroll = () => {
-    return filteredEmployees.reduce((sum, e) => sum + e.salary, 0);
+    return filteredEmployees.reduce((sum, e) => sum + e.creditLimit, 0);
   };
 
   return (
@@ -148,9 +146,9 @@ export default function AdminEmployees() {
           value={employees.filter((e) => e.active).length.toString()}
         />
         <StatCard
-          label="Total Payroll (Monthly)"
+          label="Total Credit Limits"
           value={formatCurrency(
-            employees.reduce((sum, e) => sum + e.salary, 0),
+            employees.reduce((sum, e) => sum + e.creditLimit, 0),
           )}
         />
       </div>
@@ -167,31 +165,7 @@ export default function AdminEmployees() {
             className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-200 text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
           />
         </div>
-        <div className="flex gap-2">
-          <button
-            onClick={() => setFilterPosition("All")}
-            className={`px-4 py-2.5 rounded-lg font-medium transition-colors ${
-              filterPosition === "All"
-                ? "bg-emerald-100 text-emerald-700"
-                : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-            }`}
-          >
-            All
-          </button>
-          {positions.map((pos) => (
-            <button
-              key={pos}
-              onClick={() => setFilterPosition(pos)}
-              className={`px-4 py-2.5 rounded-lg font-medium transition-colors ${
-                filterPosition === pos
-                  ? "bg-emerald-100 text-emerald-700"
-                  : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-              }`}
-            >
-              {pos}
-            </button>
-          ))}
-        </div>
+
       </div>
 
       {/* Employees Table */}
@@ -202,17 +176,15 @@ export default function AdminEmployees() {
               <th className="text-left px-6 py-4 text-sm font-semibold text-slate-700">
                 Employee
               </th>
-              <th className="text-left px-6 py-4 text-sm font-semibold text-slate-700">
-                Position
-              </th>
+
               <th className="text-left px-6 py-4 text-sm font-semibold text-slate-700">
                 Contact
               </th>
               <th className="text-left px-6 py-4 text-sm font-semibold text-slate-700">
-                Points
+                Credit Limit
               </th>
               <th className="text-left px-6 py-4 text-sm font-semibold text-slate-700">
-                Salary
+                Balance
               </th>
               <th className="text-left px-6 py-4 text-sm font-semibold text-slate-700">
                 Status
@@ -238,25 +210,21 @@ export default function AdminEmployees() {
                     </p>
                   </div>
                 </td>
-                <td className="px-6 py-4">
-                  <span className="inline-block px-3 py-1 rounded-lg bg-blue-100 text-blue-700 text-sm font-medium">
-                    {employee.position}
-                  </span>
-                </td>
+
                 <td className="px-6 py-4">
                   <div className="text-sm text-slate-900 font-medium">
                     {employee.phone}
                   </div>
                   <div className="text-sm text-slate-500">{employee.email}</div>
                 </td>
-                <td className="px-6 py-4">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-700 font-bold text-sm">
-                     <Coins className="w-3.5 h-3.5" />
-                     {employee.points || 0}
-                  </span>
-                </td>
                 <td className="px-6 py-4 font-semibold text-slate-900">
-                  {formatCurrency(employee.salary)}
+                  {formatCurrency(employee.creditLimit)}
+                </td>
+                <td className="px-6 py-4">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full  font-bold text-sm">
+                     <Coins className="w-3.5 h-3.5" />
+                     {formatCurrency(employee.currentBalance || 0)}
+                  </span>
                 </td>
                 <td className="px-6 py-4">
                   <button
@@ -276,7 +244,7 @@ export default function AdminEmployees() {
                   <div className="flex items-center justify-end gap-2">
                     <button
                       onClick={() => setTopUpId(employee.id)}
-                      title="Top up points"
+                      title="Top up balance"
                       className="p-2 hover:bg-amber-100 text-amber-600 rounded-lg transition-colors"
                     >
                       <Coins className="w-4 h-4" />
@@ -390,50 +358,23 @@ export default function AdminEmployees() {
                 </div>
               </div>
 
-              {/* Position & Salary */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-semibold text-slate-900 block mb-1.5">
-                    Position *
-                  </label>
-                  <select
-                    value={form.position}
-                    onChange={(e) =>
-                      setForm((prev) => ({
-                        ...prev,
-                        position: e.target.value as
-                          | "Manager"
-                          | "Cashier"
-                          | "Cook"
-                          | "Delivery",
-                      }))
-                    }
-                    className="w-full px-4 py-2 rounded-lg border border-slate-200 text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                  >
-                    {positions.map((pos) => (
-                      <option key={pos} value={pos}>
-                        {pos}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="text-sm font-semibold text-slate-900 block mb-1.5">
-                    Salary (LKR) *
-                  </label>
-                  <input
-                    type="number"
-                    required
-                    min="0"
-                    step="100"
-                    value={form.salary}
-                    onChange={(e) =>
-                      setForm((prev) => ({ ...prev, salary: e.target.value }))
-                    }
-                    placeholder="0"
-                    className="w-full px-4 py-2 rounded-lg border border-slate-200 text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                  />
-                </div>
+              {/* Credit Limit */}
+              <div>
+                <label className="text-sm font-semibold text-slate-900 block mb-1.5">
+                  Credit Limit (LKR) *
+                </label>
+                <input
+                  type="number"
+                  required
+                  min="0"
+                  step="100"
+                  value={form.creditLimit}
+                  onChange={(e) =>
+                    setForm((prev) => ({ ...prev, creditLimit: e.target.value }))
+                  }
+                  placeholder="0"
+                  className="w-full px-4 py-2 rounded-lg border border-slate-200 text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
               </div>
 
               {/* Join Date */}
@@ -495,7 +436,7 @@ export default function AdminEmployees() {
              <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold flex items-center gap-2 text-slate-900">
                    <Coins className="w-5 h-5 text-amber-500" />
-                   Add Points
+                   Add Balance
                 </h2>
                 <button onClick={() => setTopUpId(null)} className="p-1 hover:bg-slate-100 rounded-lg">
                    <X className="w-5 h-5 text-slate-500" />
@@ -503,7 +444,7 @@ export default function AdminEmployees() {
              </div>
              <form onSubmit={handleTopUpSubmit}>
                 <div className="mb-6">
-                   <label className="text-sm font-semibold text-slate-900 block mb-2">Points Amount</label>
+                   <label className="text-sm font-semibold text-slate-900 block mb-2">Balance Amount</label>
                    <input
                      type="number"
                      min="1"

@@ -21,7 +21,7 @@ interface AppStore {
   addEmployee: (employee: Omit<Employee, 'id'>) => void;
   updateEmployee: (id: string, updates: Partial<Employee>) => void;
   deleteEmployee: (id: string) => void;
-  topUpEmployeePoints: (id: string, amount: number) => void;
+  topUpEmployeeBalance: (id: string, amount: number) => void;
 
   // Cart (for POS)
   cart: CartItem[];
@@ -52,10 +52,10 @@ const mockEmployees: Employee[] = [
     name: 'Kasun Perera',
     email: 'kasun@restaurant.com',
     phone: '555-0101',
-    position: 'Manager',
+
     joinDate: '2023-01-15',
-    salary: 50000,
-    points: 1200,
+    creditLimit: 50000,
+    currentBalance: 1200,
     active: true,
   },
   {
@@ -63,10 +63,10 @@ const mockEmployees: Employee[] = [
     name: 'Nisansala Fernando',
     email: 'nisansala@restaurant.com',
     phone: '555-0102',
-    position: 'Cook',
+
     joinDate: '2023-02-20',
-    salary: 45000,
-    points: 850,
+    creditLimit: 45000,
+    currentBalance: 850,
     active: true,
   },
   {
@@ -74,10 +74,10 @@ const mockEmployees: Employee[] = [
     name: 'Dinesh Silva',
     email: 'dinesh@restaurant.com',
     phone: '555-0103',
-    position: 'Cashier',
+
     joinDate: '2023-03-10',
-    salary: 28000,
-    points: 2500,
+    creditLimit: 28000,
+    currentBalance: 2500,
     active: true,
   },
   {
@@ -85,10 +85,10 @@ const mockEmployees: Employee[] = [
     name: 'Tharuka Senanayake',
     email: 'tharuka@restaurant.com',
     phone: '555-0104',
-    position: 'Cook',
+
     joinDate: '2023-04-05',
-    salary: 32000,
-    points: 0,
+    creditLimit: 32000,
+    currentBalance: 0,
     active: true,
   },
 ];
@@ -148,13 +148,13 @@ export const useStore = create<AppStore>((set, get) => ({
     get().addToast('Employee deleted.', 'info');
   },
 
-  topUpEmployeePoints: (id, amount) => {
+  topUpEmployeeBalance: (id, amount) => {
     set((state) => ({
       employees: state.employees.map((e) =>
-        e.id === id ? { ...e, points: (e.points || 0) + amount } : e
+        e.id === id ? { ...e, currentBalance: (e.currentBalance || 0) + amount } : e
       ),
     }));
-    get().addToast(`Added ${amount} points successfully!`, 'success');
+    get().addToast(`Added ${amount} balance successfully!`, 'success');
   },
 
   // Cart
